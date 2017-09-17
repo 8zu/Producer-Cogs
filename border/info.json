@@ -1,0 +1,7 @@
+{
+    "NAME" : "border",
+    "AUTHOR" : "AyaYuuki",
+    "SHORT" : "Print ML border",
+    "DESCRIPTION" : "Uses the data from http://mlborder.com/ to print current borders",
+    "DISABLED" : false
+}
