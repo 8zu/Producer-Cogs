@@ -51,11 +51,21 @@ class Border:
             borders = {int(k):v for k, v in border_summary['borders'].items()}
 
             msg = '\n'.join([f'{event_name}\n{event_info}\n{left_or_passed_time}\n\n{now}'] + \
-                            [f"{n}位：\t\t{data:,}" for n, data in sorted(borders.items())])
+                            self.pretty_print_border(borders))
 
             await self.bot.say(msg)
         else:
             await self.bot.say("mlborder need an event code.")
+
+    @staticmethod
+    def pretty_print_border(borders):
+        maxlen = len(str(max(borders))) + 8 + len('{:,}'.format(max(borders.values())))
+        lines = ['```']
+        for n, data in sorted(borders.items()):
+            offset = len(str(n)) + 8
+            lines.append(f"{n}位：  {data:>{maxlen-offset},}")
+        lines.append('```')
+        return lines
 
 def setup(bot):
     bot.add_cog(Border(bot))
