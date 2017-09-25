@@ -48,15 +48,10 @@ class Border:
                 left_or_passed_time += '　過ごしだ'
             border_summary = json_data['border_summary']
             now = (datetime.datetime.fromtimestamp(current_timestamp) + datetime.timedelta(hours=1)).strftime('%Y/%m/%d %H:%M:%S')
-            borders = border_summary['borders']
+            borders = {int(k):v for k, v in border_summary['borders'].items()}
 
-            msg = '\n'.join([f'{event_name}\n{event_info}\n{left_or_passed_time}\n\n{now}',
-                             f"1位：\t\t{borders['1']:,}",
-                             f"10位：\t\t{borders['10']:,}",
-                             f"100位：\t\t{borders['100']:,}",
-                             f"500位：\t\t{borders['500']:,}",
-                             f"1200位：\t\t{borders['1200']:,}",
-                             f"1300位：\t\t{borders['1300']:,}"])
+            msg = '\n'.join([f'{event_name}\n{event_info}\n{left_or_passed_time}\n\n{now}'] + \
+                            [f"{n}位：\t\t{data:,}" for n, data in sorted(borders.items())])
 
             await self.bot.say(msg)
         else:
