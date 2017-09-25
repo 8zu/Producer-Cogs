@@ -11,7 +11,7 @@ This is a cog for [Red-DiscordBot](https://github.com/Cog-Creators/Red-DiscordBo
 then
 
 ```
-[p]cog repo install producer-cogs border
+[p]cog install producer-cogs border
 ```
 
 to use
