@@ -1,26 +1,28 @@
-import asyncio
 import datetime
 import json
 import time
-
-import aiohttp
-import discord
+import threading
+import border.event_record as er
 from discord.ext import commands
-from pyquery import PyQuery as pq
+from pyquery import PyQuery as Pq
+
 
 class Border:
     def __init__(self, bot):
         self.bot = bot
+
+    t: threading = None
+    event_code: int = None
 
     @commands.command()
     async def mlborder(self, event_code: int = None):
         # Catch current ranking points. Need event code.
         if event_code is not None:
             url = "http://mlborder.com/events/{}/".format(event_code)
-            document = pq(url)
+            document = Pq(url)
             title = document('title').text()
             body = document('body')
-            border_div = pq(body('.tab-pane')[0])('div')
+            border_div = Pq(body('.tab-pane')[0])('div')
             data_react_props = border_div.html()
 
             original_data = data_react_props[data_react_props.index('{'):data_react_props.rindex('}') + 1]
@@ -47,8 +49,9 @@ class Border:
                 left_or_passed_time += time.strftime('%H:%M:%S', time.localtime(pass_timestamp))
                 left_or_passed_time += '　過ごしだ'
             border_summary = json_data['border_summary']
-            now = (datetime.datetime.fromtimestamp(current_timestamp) + datetime.timedelta(hours=1)).strftime('%Y/%m/%d %H:%M:%S')
-            borders = {int(k):v for k, v in border_summary['borders'].items()}
+            now = (datetime.datetime.fromtimestamp(current_timestamp) + datetime.timedelta(hours=1)).strftime(
+                '%Y/%m/%d %H:%M:%S')
+            borders = {int(k): v for k, v in border_summary['borders'].items()}
 
             msg = '\n'.join([f'{event_name}\n{event_info}\n{left_or_passed_time}\n\n{now}'] + \
                             self.pretty_print_border(borders))
@@ -57,15 +60,33 @@ class Border:
         else:
             await self.bot.say("mlborder need an event code.")
 
+    @commands.command()
+    async def mltdborder(self, event_code: int = None):
+        if event_code is not None:
+            self.event_code = event_code
+            if self.t is None:
+                self.t = threading.Timer(900, er.fetch_latest_event_border(self.event_code))
+                self.t.start()
+            elif self.t.isAlive:
+                self.t.cancel()
+                self.t = threading.Timer(900, er.fetch_latest_event_border(self.event_code))
+                self.t.start()
+        msg = er.get_latest_event_data(self.event_code).__repr__().join('\n')
+        with open(er.cache_path, "r") as cache:
+            for line in cache.buffer:
+                msg.join(line.__repr__() + '\n')
+        await self.bot.say(msg)
+
     @staticmethod
     def pretty_print_border(borders):
-        maxlen = len(str(max(borders))) + 8 + len('{:,}'.format(max(borders.values())))
+        max_len = len(str(max(borders))) + 8 + len('{:,}'.format(max(borders.values())))
         lines = ['```']
         for n, data in sorted(borders.items()):
             offset = len(str(n)) + 8
-            lines.append(f"{n}位：  {data:>{maxlen-offset},}")
+            lines.append(f"{n}位：  {data:>{max_len-offset},}")
         lines.append('```')
         return lines
+
 
 def setup(bot):
     bot.add_cog(Border(bot))
