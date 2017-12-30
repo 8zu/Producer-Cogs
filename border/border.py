@@ -50,8 +50,8 @@ class Border:
                 '%Y/%m/%d %H:%M:%S')
             borders = {int(k): v for k, v in border_summary['borders'].items()}
 
-            msg = '\n'.join([f'{event_name}\n{event_info}\n{left_or_passed_time}\n\n{now}'] + \
-                            self.pretty_print_border(borders))
+            msg = '\n'.join(
+                [f'{event_name}\n{event_info}\n{left_or_passed_time}\n\n{now}'] + self.pretty_print_border(borders))
 
             await self.bot.say(msg)
         else:
