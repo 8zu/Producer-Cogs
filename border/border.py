@@ -1,11 +1,11 @@
 import datetime
-import threading
 import json
+import threading
 import time
 
+import requests as req
 from discord.ext import commands
 from pyquery import PyQuery as Pq
-from requests import request as req
 
 # [theater-gate] website url
 event_url = "https://days.765prolive.theater/event/"
