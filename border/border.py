@@ -1,10 +1,9 @@
 import datetime
-import json
-import time
 import threading
-import border.event_record as er
+
 from discord.ext import commands
-from pyquery import PyQuery as Pq
+
+from border.event_record import *
 
 
 class Border:
@@ -63,15 +62,15 @@ class Border:
             global e_code
             e_code = event_code
             global t
-            t = threading.Timer(900, er.fetch_latest_event_border(e_code))
+            t = threading.Timer(900, fetch_latest_event_border(e_code))
             if t.isAlive:
                 t.cancel()
-                t = threading.Timer(900, er.fetch_latest_event_border(e_code))
+                t = threading.Timer(900, fetch_latest_event_border(e_code))
                 t.start()
             else:
                 t.start()
-        msg = er.get_latest_event_data(e_code).__repr__().join('\n')
-        with open(er.cache_path, "r") as cache:
+        msg = get_latest_event_data(e_code).__repr__().join('\n')
+        with open(cache_path, "r") as cache:
             for line in cache.buffer:
                 msg.join(line.__repr__() + '\n')
         await self.bot.say(msg)
