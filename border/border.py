@@ -11,7 +11,7 @@ class Border:
     def __init__(self, bot):
         self.bot = bot
         self.t = None
-        self.event_code: int = 0
+        self.event_code = 0
 
     @commands.command()
     async def mlborder(self, event_code: int = None):
