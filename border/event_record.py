@@ -61,7 +61,10 @@ def fetch_latest_event_border(event_code):
     """
     actual_api_url = json_api_url.format(event_code)
     response = req.get(actual_api_url)
-    obj = json.loads(response.text)
-    latest_border = obj['data']['logs'][-1]
-    with open(cache_path, "w") as cache_file:
-        json.dump(latest_border, cache_file)
+    if response.status_code == 200:
+        obj = json.loads(response.text)
+        latest_border = obj['data']['logs'][-1]
+        with open(cache_path, "w") as cache_file:
+            json.dump(latest_border, cache_file)
+    else:
+        raise IOError(f"Error {response.status_code}")
