@@ -11,7 +11,7 @@ class Border:
     def __init__(self, bot):
         self.bot = bot
 
-    t: threading = None
+    t: threading = threading.Timer()
     event_code: int = None
 
     @commands.command()
