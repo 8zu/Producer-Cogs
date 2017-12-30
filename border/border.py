@@ -10,8 +10,6 @@ from pyquery import PyQuery as Pq
 class Border:
     def __init__(self, bot):
         self.bot = bot
-        self.t = None
-        self.event_code = 0
 
     @commands.command()
     async def mlborder(self, event_code: int = None):
@@ -62,15 +60,17 @@ class Border:
     @commands.command()
     async def mltdborder(self, event_code: int = None):
         if event_code is not None:
-            self.event_code = event_code
-            if self.t is None:
-                self.t = threading.Timer(900, er.fetch_latest_event_border(self.event_code))
-                self.t.start()
-            elif self.t.isAlive:
-                self.t.cancel()
-                self.t = threading.Timer(900, er.fetch_latest_event_border(self.event_code))
-                self.t.start()
-        msg = er.get_latest_event_data(self.event_code).__repr__().join('\n')
+            global e_code
+            e_code = event_code
+            global t
+            t = threading.Timer(900, er.fetch_latest_event_border(e_code))
+            if t.isAlive:
+                t.cancel()
+                t = threading.Timer(900, er.fetch_latest_event_border(e_code))
+                t.start()
+            else:
+                t.start()
+        msg = er.get_latest_event_data(e_code).__repr__().join('\n')
         with open(er.cache_path, "r") as cache:
             for line in cache.buffer:
                 msg.join(line.__repr__() + '\n')
